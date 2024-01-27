@@ -1,4 +1,4 @@
-    <?php
+<?php
 session_start();
 if ($_SESSION["peran"] == "USER") {
     header("Location: logout.php");
@@ -11,61 +11,39 @@ if (!isset($_SESSION["login"])) {
 
 include '../koneksi.php';
 
-$id = $_GET["id"];  
-$query_daftartamu = "SELECT * FROM daftartamu WHERE id = $id";
-$result_daftartamu = mysqli_query($conn, $query_daftartamu);
-$row_daftartamu = mysqli_fetch_assoc($result_daftartamu);
+$id = $_GET["id"];
+$query_tbl_user = "SELECT * FROM tbl_user WHERE id_user = $id";
+$result_tbl_user = mysqli_query($conn, $query_tbl_user);
+$row_daftartamu = mysqli_fetch_assoc($result_tbl_user);
 
-//query tampilan data daftartamu
-if (isset($_POST["submit"])) {
-    $nama_instansi = htmlspecialchars($_POST["nama_instansi"]);
-    $nama_tamu = htmlspecialchars($_POST["nama_tamu"]);
-    $jumlah = htmlspecialchars($_POST["jumlah"]);
-    $no_telepon = htmlspecialchars($_POST["no_telepon"]);
-    $perihal_kunjungan = htmlspecialchars($_POST["perihal_kunjungan"]);
-    $tanggal = htmlspecialchars($_POST["tanggal"]);
-    $jam = htmlspecialchars($_POST["jam"]);
-    $status = htmlspecialchars($_POST["status"]);    
-    $surat_permohonan = htmlspecialchars($_POST["surat_permohonan"]);
-    $alasan = htmlspecialchars($_POST["alasan"]);
 
-    $query = "UPDATE daftartamu SET
-            nama_instansi = '$nama_instansi',
-            nama_tamu = '$nama_tamu',
-            jumlah = '$jumlah',
-            no_telepon = '$no_telepon',
-            perihal_kunjungan = '$perihal_kunjungan',
-            tanggal= '$tanggal',
-            jam= '$jam',
-            status= '$status',
-            surat_permohonan = '$surat_permohonan', 
-            alasan = '$alasan'
-            WHERE id = $id
-            ";
-    $edit = mysqli_query($conn, $query);
+$query_pengguna = "SELECT * FROM tbl_pengguna";
+$result_pengguna = mysqli_query($conn, $query_pengguna);
+$row_pengguna = mysqli_fetch_assoc($result_pengguna);
+?>
+<?php
+// Kode PHP untuk mengecek status edited sebelum menampilkan formulir edit
 
-    if ($edit) {
-        // Sertakan SweetAlert JS
-  echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>';
-  
-  // Tampilkan pesan SweetAlert menggunakan JavaScript
-  echo '<script>
-          Swal.fire({
-            title: "Data Anda Di TOLAK",
-            text: "'.($edit['id']).'",
-            icon: "error",
-            confirmButtonText: "OK"
-          });
-        </script>';
+$id = $_GET['id'];
+
+// Periksa status edited
+$sql_check = "SELECT konfirmasi FROM tbl_pengguna WHERE id = $id";
+$result = mysqli_query($conn, $sql_check);
+
+if ($result) {
+    $row = mysqli_fetch_assoc($result);
+    $edited_status = $row['konfirmasi'];
+
+    if ($edited_status == 1) {
+        // Data sudah diedit, berikan pemberitahuan atau tindakan sesuai dengan kebutuhan Anda
+        echo  "<script>Data sudah diubah dan tidak dapat diedit lagi.</script>";
     } else {
-        echo "<script type='text/javascript'>
-            alert('Data GAGAL diedit...!');
-            document.location.href = 'daftartamu-edit.php?id=$id';
-            </script>";
+        // Tampilkan formulir edit
+        // ...
     }
 }
-
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -92,7 +70,7 @@ if (isset($_POST["submit"])) {
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Data Tamu</h1>
+                            <h1>Approve AKun</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
@@ -120,27 +98,11 @@ if (isset($_POST["submit"])) {
                                 <form action="" method="post">
                                     <div class="card-body">
                                         <div class="form-group">
-                                            <!-- <label for="nama_instansi">Nama Instansi :</label> -->
-                                            <input type="hidden" class="form-control" id="nama_instansi" name="nama_instansi" value="<?= $row_daftartamu["nama_instansi"]; ?>" placeholder="Masukkan Nama tamu" readonly>
-                                            <!-- <label for="nama_tamu">Nama Tamu:</label> -->
-                                            <input type="hidden" class="form-control" id="nama_tamu" name="nama_tamu" value="<?= $row_daftartamu["nama_tamu"]; ?>" placeholder="Masukkan No HP" readonly>
-                                            <!-- <label for="jumlah">Jumlah Tamu :</label> -->
-                                            <input type="hidden" class="form-control" id="jumlah" name="jumlah" value="<?= $row_daftartamu["jumlah"]; ?>" placeholder="Masukkan jumlah Tamu Yang Berkunjung" readonly>
-                                            <!-- <label for="no_telepon">No Telepon :</label> -->
-                                            <input type="hidden" class="form-control" id="no_telepon" name="no_telepon" value="<?= $row_daftartamu["no_telepon"]; ?>" placeholder="Masukkan Nomor Telephone Yang AKtif" readonly>
-                                            <!-- <label for="perihal_kunjungan">Perihal Kunjungan :</label> -->
-                                            <input type="hidden" class="form-control" id="perihal_kunjungan" name="perihal_kunjungan" value="<?= $row_daftartamu["perihal_kunjungan"]; ?>" placeholder="Masukkan Perihal Kunjungan Bertamu" readonly>    
-                                            <!-- <label for="tanggal">Tanggal :</label> -->
-                                            <input type="hidden" class="form-control" id="tanggal" name="tanggal" value="<?= $row_daftartamu["tanggal"]; ?>" placeholder="Masukkan Tanggal In Bertamu" readonly>    
-                                            <!-- <label for="jam">Jam :</label> -->
-                                            <input type="hidden" class="form-control" id="jam" name="jam" value="<?= $row_daftartamu["jam"]; ?>" placeholder="Jam ingin berkunjung" readonly>    
-                                             <!-- <label type="hidden" for="surat_permohonan">Surat Permohonan :</label> -->
-                                            <input type="hidden" class="form-control" id="surat_permohonan" name="surat_permohonan" value="<?= $row_daftartamu["surat_permohonan"]; ?>" placeholder="Scan Surat Permohonan" readonly>        
-                                            <!-- <label for="status">Status :</label>
-                                            <input type="text" class="form-control" id="status" name="status" value="<?= $row_daftartamu["surat_permohonan"]; ?>" placeholder="Scan Surat Permohonan" required> -->
-                                            <input type="hidden" class="form-control" id="status" name="status" value="Tolak" >
+                                            <input type="hidden" class="form-control" id="status" name="status" value="Tolak">
+                                            <input type="hidden" class="form-control" id="konfirmasi" name="konfirmasi" value="1">
+                                            <input type="hidden" class="form-control" id="oleh" name="oleh" value="<?= $row_pengguna["username"] ?>" readonly>
                                             <label for="Alasan">Alasan di Tolak :</label>
-                                            <textarea type="text" class="form-control" id="alasan" name="alasan" required rows="4"> </textarea>
+                                            <input type="text" class="form-control" id="alasan" name="alasan" required rows="4" autocomplete="off">
                                             <br>
                                             <!-- <select name="status" id="status" class="form-select" required>
                                                 <option value="">-- Pilih Status --</option>
@@ -151,7 +113,7 @@ if (isset($_POST["submit"])) {
                                         </div>
                                     </div>
                                     <div class="card-footer">
-                                        <button type="submit" name="submit" class="btn btn-primary mr-1">Simpan</button>
+                                        <button type="submit" name="submit" class="btn btn-dark mr-1">Kirim</button>
                                     </div>
                                 </form>
                             </div>
@@ -170,7 +132,6 @@ if (isset($_POST["submit"])) {
 
     </div>
     <!-- ./wrapper -->
-
     <!-- JQuery -->
     <script src="../plugins/jquery/jquery.min.js"></script>
     <!-- Bootstrap 4 -->
@@ -217,3 +178,47 @@ if (isset($_POST["submit"])) {
 </body>
 
 </html>
+
+<?php
+
+//query tampilan data daftartamu
+if (isset($_POST["submit"])) {
+    $status = "0";
+
+    $query = "UPDATE tbl_pengguna SET 
+    status= '$status'
+    WHERE id = $id";
+
+    $edit = mysqli_query($conn, $query);
+
+    if ($edit) {
+        // Tampilkan pesan SweetAlert menggunakan JavaScript
+        echo '<script>
+        Swal.fire({
+            title: "Apakah yakin menolak data ini?",
+            text: "Data tidak dapat di ubah",
+            icon: "error",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: "TOLAK!",
+                    text: "Data ini berhasil di tolak",
+                    icon: "success"
+                }).then(() => {
+                    // Redirect to the desired page
+                    window.location.href = "daftartamu.php";
+                });
+            }
+        });
+    </script>';
+    } else {
+        echo "<script type='text/javascript'>
+                alert('Data GAGAL diedit...!');
+                document.location.href = 'daftartamu-edit.php?id=$id';
+            </script>";
+    }
+}

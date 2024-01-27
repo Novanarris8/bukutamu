@@ -1,0 +1,92 @@
+/* Add some styling for the page */
+body {
+  font-family: Arial, sans-serif;
+  background-color: rgb(255, 247, 237);
+}
+
+.warna-header-berita {
+  background-color: rgb(189, 189, 247);
+}
+
+.profile-container {
+  padding-top: 15px;
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.profile-image {
+  width: 500px;
+  height: 250px;
+  object-fit: cover;
+}
+
+.profile-name {
+  font-size: 2em;
+  margin-top: 20px;
+}
+
+.profile-description {
+  font-size: 1.2em;
+  line-height: 1.5;
+  margin-top: 20px;
+}
+
+/* .hidden {
+  display: none;
+} */
+
+.warna-kanan {
+  background: linear-gradient(to bottom, rgb(189, 189, 247), #29adb2);
+}
+
+.warna-kiri {
+  background: linear-gradient(to bottom, rgb(189, 189, 247), #29adb2);
+}
+
+.cssinputan {
+  width: 100%;
+  height: 50px;
+  border-color: black;
+}
+
+.ini-gambar-ditengah {
+  width: 220px;
+  height: 250px;
+  background-color: aqua;
+}
+
+/* .untuk-foto {
+  padding-bottom: -50px;
+} */
+
+.ini-label {
+  /* background-color: #eee; */
+  color: #8b8b8b;
+}
+
+.nomor-surat {
+  display: none;
+}
+
+.warna-button {
+  background: linear-gradient(
+    to right,
+    rgb(189, 189, 247),
+    #29adb2,
+    rgb(189, 189, 247)
+  );
+  color: white;
+}
+
+.warna-button:hover {
+  background: linear-gradient(to right, #29adb2, rgb(189, 189, 247), #29adb2);
+  border: 3px solid transparent;
+  border-color: rgb(17, 0, 255);
+  color: black;
+}
+
+/* footer */
+.warna-footer {
+  background-color: #29adb2;
+}

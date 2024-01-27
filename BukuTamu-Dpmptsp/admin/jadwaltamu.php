@@ -1,19 +1,11 @@
 <?php
-session_start();
-if ($_SESSION["peran"] == "USER") {
-    header("Location: logout.php");
-    exit;
-}
-if (!isset($_SESSION["login"])) {
-    header("Location: ../index.php");
-    exit;
-}
+include "untuk-sesi.php";
 
-include '../koneksi.php';
 
-$query = "SELECT * FROM jadwaltamu";
+$query = "SELECT * FROM tbl_pendaftaran Pen 
+          LEFT JOIN tbl_pegawai Peg ON Pen.id_pegawai = Peg.id_pegawai
+           ";
 $result = mysqli_query($conn, $query);
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -21,7 +13,7 @@ $result = mysqli_query($conn, $query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Jadwal Tamu | DPMPTSP KOTA BANJARMASIN</title>
+    <title>Daftar Pemohon | DPMPTSP</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
@@ -30,86 +22,95 @@ $result = mysqli_query($conn, $query);
     <link rel="stylesheet" href="../dist/css/adminlte.min.css">
 </head>
 
-<body class= "hold-transition sidebar-mini">
+<body class="hold-transition sidebar-mini">
     <div class="wrapper">
 
-    <?php include "theme-header.php"; ?>
+        <?php include "theme-header.php"; ?>
 
-    <?php include "theme-sidebar.php"; ?>
+        <?php include "theme-sidebar.php"; ?>
 
-    <!-- Content Wrapper. Contains page content -->
-    <div class="content-wrapper">
-    <!-- Content Header (page header) -->
-    <section class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1>Data jadwal Tamu</h1>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="index.php">Home</a></li>
-                    <li class="breadcrumb-item active">Jadwal Tamu</li>
-                    </ol>
-                </div>
-            </div>
-        </div><!-- /.container-fluid -->
-    </section>
-
-    <!-- Main content -->
-    <section class="content">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                <a href="jadwaltamu-tambah.php" class="btn btn-primary"><i class="fa fa-plus-circle"></i> Tambah Data</a>
-                    </div>
-                    <!-- /.card-header -->
-                    <div class="card-body">
-                        <table id="example1" class="table table-bordered table-striped">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Nama Instansi</th>
-                                    <th>Tanggal</th>
-                                    <th>Jam</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php $no = 1;
-                                while ($row = mysqli_fetch_assoc($result)) { ?>
-                                    <tr>
-                                        <td><?php echo $no; ?></td>
-                                        <td><?php echo $row["nama_instansi"]; ?></td>
-                                        <td><?php echo $row["tanggal"]; ?></td>
-                                        <td><?php echo $row["jam"]; ?></td>
-                                                                              <td>
-<a href="jadwaltamu-edit.php?id=<?php echo $row["id"]; ?>" class="btn btn-success btn-xs mr-1"><i class="fa fa-edit">Ubah</i></a>
-<a href="jadwaltamu-hapus.php?id=<?php echo $row["id"]; ?>" class="btn btn-danger btn-xs text-light" onClick="return confirm('Anda yakin ingin hapus data ini?')"><i class="fa fa-trash"></i> Hapus</a>
-                                        </td>
-                                    </tr>
-                                <?php $no++;
-                                } ?>
-                            </tbody>
-                        </table>
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <!-- Content Header (page header) -->
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>Jadwal Kunjungan DPMPTSP</h1>
+                            <h1>Kota Banjarmasin</h1>
                         </div>
-                        <!-- /.card-body -->
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="index.php">Home</a></li>
+                                <li class="breadcrumb-item active">Pemohon</li>
+                            </ol>
+                        </div>
                     </div>
-                    <!-- /.card -->
-                </div>
-                <!-- /.col -->
-            </div>
-            <!-- /.row -->
-        </div>
-        <!-- /.container-fluid -->
-    </section>
-    <!-- /.content -->
-    </div>
-    <!-- /.content-wrapper -->
+                </div><!-- /.container-fluid -->
+            </section>
 
-    <?php include "theme-footer.php"; ?>
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <a href="jadwaltamu-tambah.php" class="btn btn-primary"><i class="fa fa-plus-circle"></i> Tambah Data</a>
+                                </div>
+                                <!-- /.card-header -->
+                                <div class="card-body">
+                                    <table id="example1" class="table table-bordered table-striped">
+                                        <thead class="table-primary">
+                                            <tr>
+                                                <th>Action</th>
+                                                <th>Pegawai</th>
+                                                <th>Hari</th>
+                                                <th>Jam</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php $no = 1;
+                                            while ($row = mysqli_fetch_assoc($result)) { ?>
+                                                <tr>
+                                                    <td>
+                                                        <a href="jadwaltamu-edit.php?id_daftar=<?= $row["id_daftar"] ?>" class="btn btn-primary"><i class="fas fa-edit"></i></a>
+                                                        <a href="jadwaltamu-hapus.php?id_daftar=<?= $row["id_daftar"] ?>" class="btn btn-danger mx-2" onclick="return confirm('Apakah anda yakin ingin menghapus data ini?')"><i class="fas fa-trash "></i></a>
+                                                    </td>
+                                                    <td><?php echo $row["nama_pegawai"]; ?></td>
+                                                    <td><?php echo $row["tanggal_daftar"]; ?></td>
+                                                    <td><?php echo $row["jam_daftar"]; ?></td>
+                                                    <td>
+                                                        <?php if ($row["status_daftar"] == 1) { ?>
+                                                            <span class="badge bg-primary">Tersedia</span>
+                                                        <?php } else if ($row["status_daftar"] == 2) { ?>
+                                                            <span class="badge bg-success">Full</span>
+                                                        <?php } ?>
+                                                    </td>
+                                                </tr>
+                                            <?php $no++;
+                                            } ?>
+                                        </tbody>
+                                    </table>
+
+
+                                </div>
+                                <!-- /.card-body -->
+                            </div>
+                            <!-- /.card -->
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+                </div>
+                <!-- /.container-fluid -->
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- /.content-wrapper -->
+
+        <?php include "theme-footer.php"; ?>
 
     </div>
     <!-- ./wrapper -->
@@ -142,18 +143,12 @@ $result = mysqli_query($conn, $query);
                 "responsive": true,
                 "lengthChange": false,
                 "autoWidth": false,
-                "buttons": ["copy", "csv", "excel", "pdf", "print"]
+                "buttons": ["copy", "csv", "excel", "pdf", "print"],
+                "order": [
+                    [0, "asc"]
+                ]
             }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-            $('#example2').DataTable({
-                "paging": true,
-                "lengthChange": false,
-                "searching": false,
-                "ordering": true,
-                "info": true,
-                "autoWidth": false,
-                "responsive": true,
-            });
-            });
+        });
     </script>
 </body>
 

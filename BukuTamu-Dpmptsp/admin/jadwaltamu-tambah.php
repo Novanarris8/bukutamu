@@ -13,10 +13,11 @@ include '../koneksi.php';
 
 //query tampilan data jadwaltamu
 if (isset($_POST["submit"])) {
-    $nama_instansi = htmlspecialchars($_POST["nama_instansi"]);
-    $tanggal = htmlspecialchars($_POST["tanggal"]);
-    $jam = htmlspecialchars($_POST["jam"]);
-    $query = "INSERT INTO jadwaltamu VALUES ('', '$nama_instansi', '$tanggal', '$jam')";
+    $id_pegawai = htmlspecialchars($_POST["id_pegawai"]);
+    $tanggal_daftar = htmlspecialchars($_POST["tanggal_daftar"]);
+    $jam_daftar = htmlspecialchars($_POST["jam_daftar"]);
+    $status_daftar = htmlspecialchars($_POST["status_daftar"]);
+    $query = "INSERT INTO tbl_pendaftaran VALUES ('', '$id_pegawai', '$tanggal_daftar', '$jam_daftar','$status_daftar')";
     $simpan = mysqli_query($conn, $query);
 
     if ($simpan) {
@@ -87,12 +88,29 @@ if (isset($_POST["submit"])) {
                                 <form action="" method="post">
                                     <div class="card-body">
                                         <div class="form-group">
-                                            <label for="nama_instansi">Nama Instansi :</label>
-                                            <input type="text" class="form-control" id="nama_instansi" name="nama_instansi" placeholder="Masukkan Nama instansi" required>
-                                            <label for="tanggal">Tanggal :</label>
-                                            <input type="date" class="form-control" id="tanggal" name="tanggal" placeholder="Masukkan Tanggal" required>
-                                            <label for="jam">Jam :</label>
-                                            <input type="time" class="form-control" id="jam" name="jam" placeholder="Masukkan Jam Untuk Berkunjung " required>
+                                            <label class="form-label" for="id_pegawai">Nama Instansi :</label>
+
+                                            <select class="form-control" id="id_pegawai" name="id_pegawai" required>
+                                                <option value="">-- Pilih Nama Pegawai --</option>
+                                                <?php
+                                                $query_pegawai = "SELECT * FROM tbl_pegawai";
+                                                $result_pegawai = mysqli_query($conn, $query_pegawai);
+                                                while ($row_pegawai = mysqli_fetch_assoc($result_pegawai)) {
+                                                ?>
+                                                    <option value="<?php echo $row_pegawai["id_pegawai"]; ?>"><?php echo $row_pegawai["nama_pegawai"]; ?></option>
+                                                <?php } ?>
+                                            </select>
+                                            <label for="tanggal_daftar">Tanggal :</label>
+                                            <input type="date" class="form-control" id="tanggal_daftar" name="tanggal_daftar" placeholder="Masukkan Tanggal_daftar" required>
+
+                                            <label for="jam_daftar">Jam_daftar :</label>
+                                            <input type="time" class="form-control" id="jam_daftar" name="jam_daftar" placeholder="Masukkan Jam_daftar Untuk Berkunjung " required>
+
+                                            <label for="status_daftar">Status :</label>
+                                            <select class="form-control" name="status_daftar" id="status_daftar">
+                                                <option value="1">Ada</option>
+                                                <option value="2">Full</option>
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="card-footer">

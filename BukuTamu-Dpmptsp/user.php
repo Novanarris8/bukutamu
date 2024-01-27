@@ -8,7 +8,7 @@ if (isset($_POST['registrasi'])) {
     $peran =$_POST['peran'];
 
     if ($pass !== $pass2) {
-        echo '<script>alert("Password konfirmasi salah!");</script>';
+        echo '<script>alert("Password salah!");</script>';
         echo "<meta http-equiv='refresh' content='0 url=?page=user-add'>";
         return false;
     }
@@ -96,7 +96,7 @@ if (isset($_POST['registrasi'])) {
                         </div>
                     </div>
                     <div>
-                      <input type="hidden" class="form-control" placeholder="ADMIN" name="peran" value="USER" readonly>
+                      <input type="hidden" class="form-control" name="peran" value="USER" readonly>
                         <!-- <div class="input-group-append justify-content-center">
                             <div class="input-group-text ">
                             <span class="fas fa-lock" aria-hidden="true"></span>

@@ -24,11 +24,44 @@
                 <a href="#" class="dropdown-item">
                     <i class="fas fa-key mr-2"></i> Ubah Password
                 </a>
-                <a href="logout.php" class="dropdown-item" onClick="javascript: return confirm('Konfirmasi akan logout?');">
+                <a href="#" id="logoutButton" class="dropdown-item">
                     <i class="fas fa-sign-out-alt mr-2"></i> Logout
                 </a>
             </div>
         </li>
     </ul>
 </nav>
+
+<!-- Tambahkan SweetAlert JavaScript -->
+<script src="../../js/sweetalert2.all.min.js"></script>
 <!-- /.navbar -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Tentukan elemen tautan logout
+    var logoutButton = document.getElementById('logoutButton');
+
+    // Tambahkan event listener untuk tautan logout
+    logoutButton.addEventListener('click', function (event) {
+        // Hentikan perilaku default agar tautan tidak diikuti
+        event.preventDefault();
+
+        // Tampilkan SweetAlert untuk konfirmasi logout
+        Swal.fire({
+            title: 'Logout',
+            text: 'Apakah Anda yakin ingin logout?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, Logout!'
+        }).then((result) => {
+            // Jika pengguna mengklik "Ya, Logout!"
+            if (result.isConfirmed) {
+                // Redirect ke halaman logout atau lakukan tindakan logout yang sesuai
+                window.location.href = 'logout.php';
+                session_destroy();
+            }
+        });
+    });
+});
+</script>

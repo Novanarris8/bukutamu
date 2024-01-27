@@ -1,24 +1,13 @@
 <?php
-session_start();
-if ($_SESSION["peran"] == "USER") {
-    header("Location: logout.php");
-    exit;
-}
-if (!isset($_SESSION["login"])) {
-    header("Location: ../index.php");
-    exit;
-}
+include 'untuk-sesi.php';
 
-include '../koneksi.php';
-
-$id = $_GET["id"];
-$query = "DELETE FROM jadwaltamu WHERE id = $id";
+$id_daftar = $_GET["id_daftar"];
+$query = "DELETE FROM tbl_pendaftaran WHERE id_daftar = $id_daftar";
 $delete = mysqli_query($conn, $query);
 
-    if ($delete) {
-        echo "<script type='text/javascript'>
+if ($delete) {
+    echo "<script type='text/javascript'>
         alert('Data berhasil dihapus...!');
         document.location.href = 'jadwaltamu.php'; 
         </script>";
-    }
-?>
+}

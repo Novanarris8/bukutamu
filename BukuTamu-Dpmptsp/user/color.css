@@ -1,3 +1,31 @@
+.andini {
+  background: linear-gradient(to left, #f1b7e8, rgb(104, 169, 255));
+}
 .andinip {
   font-size: 1.3rem;
+  color: black;
+}
+
+.yang-dihilangkan {
+  display: none;
+}
+
+.ini-font p {
+  color: rgba(0, 0, 0, 0.719);
+  font-weight: bold;
+}
+
+.ini-font a {
+  color: rgba(0, 0, 0, 0.719);
+  font-weight: bold;
+}
+
+.ini-font i {
+  color: rgba(0, 0, 0, 0.719);
+}
+
+/* ini untuk header */
+
+.aulia {
+  background: linear-gradient(to right,#f1b7e8, #68a9ff);
 }

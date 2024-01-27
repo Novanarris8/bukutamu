@@ -11,31 +11,21 @@ if (!isset($_SESSION["login"])) {
 
 include '../koneksi.php';
 
-//query tampilan data Konsumsi
-if (isset($_POST["submit"])) {
-    $tanggal = htmlspecialchars($_POST["tanggal"]);
-    $nama_instansi = htmlspecialchars($_POST["nama_instansi"]);
-    $nama_tamu = htmlspecialchars($_POST["nama_tamu"]);
-    $jumlah = htmlspecialchars($_POST["jumlah"]);
-    $konsumsi = htmlspecialchars($_POST["konsumsi"]);
-    $harga = htmlspecialchars($_POST["harga"]);
-    $total = $jumlah*$harga;
+// Query untuk mendapatkan data siswa dari tabel_siswa
+$querySiswa = "SELECT * FROM tbl_konsumsi A 
+                LEFT JOIN tbl_pemohon B ON A.id_pemohon = B.id_pemohon
+                LEFT JOIN tbl_user C ON B.kode_user = C.kode_user
+                LEFT JOIN tbl_pendaftaran D ON B.id_daftar = D.id_daftar";
+$resultSiswa = mysqli_query($conn, $querySiswa);
 
-    $query = "INSERT INTO konsumsi VALUES ('', '$tanggal', '$nama_instansi', '$nama_tamu', '$jumlah', '$konsumsi', '$harga', '$total')";
-    $simpan = mysqli_query($conn, $query);
+// Iid_daftarialisasi array untuk menyimpan opsi siswa
+$optionsSiswa = [];
 
-    if ($simpan) {
-        echo "<script type='text/javascript'>
-            alert('Data berhasil disimpan...!');
-            document.location.href = 'konsumsi.php';
-            </script>";
-    } else {
-        echo "<script type='text/javascript'>
-            alert('Data gagal disimpan...!');
-            document.location.href = 'konsumsi-tambah.php';
-            </script>";
-    }
+while ($rowSiswa = mysqli_fetch_assoc($resultSiswa)) {
+    // Menyusun opsi siswa dalam format "id_daftar - Nama Siswa"
+    $optionsSiswa[] = $rowSiswa['id_pemohon'] . ' - ' . $rowSiswa['nama_user'] . ' - ' . $rowSiswa['jumlahtamu_pemohon'] . ' - ' . $rowSiswa['tanggal_daftar'];
 }
+
 
 ?>
 <!DOCTYPE html>
@@ -83,7 +73,7 @@ if (isset($_POST["submit"])) {
                     <div class="row">
                         <div class="col-md-12">
                             <!-- general form elements -->
-                            <div class="card card-primary">
+                            <div class="card card-dark">
                                 <div class="card-header">
                                     <h3 class="card-title">Tambah Data</h3>
                                 </div>
@@ -92,20 +82,37 @@ if (isset($_POST["submit"])) {
                                 <form action="" method="post">
                                     <div class="card-body">
                                         <div class="form-group">
-                                            <label for="tanggal">Tanggal :</label>
-                                            <input type="date" class="form-control" id="tanggal" name="tanggal" placeholder="Masukkan tanggal" required>
-                                            <label for="nama_instansi">Nama Instansi :</label>
-                                            <input type="text" class="form-control" id="nama_instansi" name="nama_instansi" placeholder="Masukkan Nama instansi" required>
-                                            <label for="nama_tamu">Nama Tamu :</label>
-                                            <input type="text" class="form-control" id="nama_tamu" name="nama_tamu" placeholder="Masukkan Nama Lengkap Anda" required>
+
+                                            <label for="id_pemohon" class="form-label">Pemohon:</label>
+
+                                            <!-- Menggunakan elemen select untuk memilih siswa -->
+                                            <select class="form-control" name="id_pemohon" id="id_pemohon" required>
+                                                <?php
+                                                // Menampilkan opsi siswa dalam elemen select
+                                                foreach ($optionsSiswa as $option) {
+                                                    // Memisahkan data id_pemohon dan jumlahtamu_pemohon
+                                                    list($id_pemohon, $namaSiswa, $kodeKelas, $tanggalDaftar) = explode(' - ', $option);
+                                                    echo "<option value='" . $id_pemohon . "' data-kode-kelas='" . $kodeKelas . "' ambil-tanggal ='" . $tanggalDaftar . "'>" . $namaSiswa . " - " . $kodeKelas . " - " . $tanggalDaftar . " </option>";
+                                                }
+                                                ?>
+                                            </select>
+
+                                            <label for="tanggal_daftar">Tanggal Daftar :</label>
+                                            <input type="text" class="form-control" id="tanggal_daftar" name="tanggal_daftar" readonly>
+
+
                                             <label for="jumlah">Jumlah :</label>
-                                            <input type="number" step="any" min="0"id="jumlah" name="jumlah" placeholder="Masukkan jumlah Tamu" class="form-control" required>
+                                            <!-- <input type="number" step="any" min="0"id="jumlah" name="jumlah" placeholder="Masukkan Jumlah Tamu Yang Berkunjung" class="form-control" required autocomplete="off"> -->
+                                            <input type="number" class="form-control" step="any" min="0" id="jumlahtamu_pemohon" name="jumlahtamu_pemohon" readonly>
+
                                             <label for="konsumsi">Konsumsi :</label>
-                                            <input type="text" class="form-control" id="konsumsi" name="konsumsi" placeholder="Masukkan Konsumsi yang di sediakan" required>
+                                            <input type="text" class="form-control" id="konsumsi" name="makanan_konsumsi" required autocomplete="off">
+
                                             <label for="harga">Harga :</label>
-                                            <input type="number" step="any" min="0" id="harga" name="harga" placeholder="Masukkan Harga Per Pcs" class="form-control" required>
-                                             <label for="total">Total :</label>
-                                            <input type="text" class="form-control"step="any" min="0" id="total" value="0" readonly required>
+                                            <input type="number" step="any" min="0" id="harga" name="harga_konsumsi" placeholder="Masukkan Harga Per Pcs" class="form-control" required autocomplete="off">
+
+                                            <label for="total">Total :</label>
+                                            <input type="text" class="form-control" step="any" min="0" id="total" name="total_konsumsi" value="0" readonly required autocomplete="off">
                                         </div>
                                     </div>
                                     <div class="card-footer">
@@ -171,17 +178,33 @@ if (isset($_POST["submit"])) {
             });
         });
     </script>
+
+    <!-- Skrip JavaScript -->
+    <script>
+        document.getElementById('id_pemohon').addEventListener('change', function() {
+            // Dapatkan nilai id_pemohon dan jumlahtamu_pemohon dari opsi yang dipilih
+            var selectedOption = this.options[this.selectedIndex];
+            var id_pemohon = selectedOption.value;
+            var kodeKelas = selectedOption.getAttribute('data-kode-kelas');
+            var ambilTanggal = selectedOption.getAttribute('ambil-tanggal');
+
+            // Perbarui nilai pada elemen input jumlahtamu_pemohon
+            document.getElementById('jumlahtamu_pemohon').value = kodeKelas;
+            document.getElementById('tanggal_daftar').value = ambilTanggal;
+        });
+    </script>
+
 </body>
 <script type="text/javascript">
-    $("#jumlah").keyup(function() {
-        var a = parseFloat($("#jumlah").val());
+    $("#jumlahtamu_pemohon").keyup(function() {
+        var a = parseFloat($("#jumlahtamu_pemohon").val());
         var b = parseFloat($("#harga").val());
         var d = a * b;
         $("#total").val(d);
     });
 
     $("#harga").keyup(function() {
-        var a = parseFloat($("#jumlah").val());
+        var a = parseFloat($("#jumlahtamu_pemohon").val());
         var b = parseFloat($("#harga").val());
         var d = a * b;
         $("#total").val(d);
@@ -189,3 +212,33 @@ if (isset($_POST["submit"])) {
 </script>
 
 </html>
+<?php
+
+
+//query tampilan data Konsumsi
+if (isset($_POST["submit"])) {
+    $id_pemohon = htmlspecialchars($_POST["id_pemohon"]);
+    // $tanggalDaftar = htmlspecialchars($_POST["tanggal_daftar"]);
+    // $kodeKelas = htmlspecialchars($_POST["jumlahtamu_pemohon"]);
+    $makanan_konsumsi = htmlspecialchars($_POST["makanan_konsumsi"]);
+    $harga_konsumsi = htmlspecialchars($_POST["harga_konsumsi"]);
+    // $total = htmlspecialchars($_POST["total"]);
+    $total_konsumsi = htmlspecialchars($_POST["total_konsumsi"]);
+
+    $query = "INSERT INTO tbl_konsumsi (id_konsumsi, id_pemohon, makanan_konsumsi, harga_konsumsi,total_konsumsi) VALUES ('','$id_pemohon', '$makanan_konsumsi', '$harga_konsumsi', '$total_konsumsi')";
+
+    $simpan = mysqli_query($conn, $query);
+
+    if ($simpan) {
+        echo "<script type='text/javascript'>
+            alert('Data berhasil disimpan...!');
+            document.location.href = 'konsumsi.php';
+            </script>";
+    } else {
+        echo "<script type='text/javascript'>
+            alert('Data gagal disimpan...!');
+            document.location.href = 'konsumsi-tambah.php';
+            </script>";
+    }
+}
+?>

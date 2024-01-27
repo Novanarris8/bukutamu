@@ -1,23 +1,45 @@
 <?php
-session_start();
-if ($_SESSION["peran"] == "USER") {
-    header("Location: logout.php");
-    exit;
-}
-if (!isset($_SESSION["login"])) {
-    header("Location: ../index.php");
-    exit;
-}
+include "untuk-sesi.php";
 
-include '../koneksi.php';
+$query_pemohon = "SELECT COUNT(*) AS jumlah_pemohon FROM tbl_pemohon";
+$result_pemohon = mysqli_query($conn, $query_pemohon);
+$row_pemohon = mysqli_fetch_assoc($result_pemohon);
+$jumlah_pemohon = $row_pemohon['jumlah_pemohon'];
+
+$query_pemohon1 = "SELECT COUNT(*) AS jumlah_pemohon FROM tbl_pemohon WHERE status_pemohon='Di Verifikasi'";
+$result_pemohon1 = mysqli_query($conn, $query_pemohon1);
+$row_pemohon1 = mysqli_fetch_assoc($result_pemohon1);
+$jumlah_pemohon1 = $row_pemohon1['jumlah_pemohon'];
+
+// $queryMemanggil = "SELECT * FROM tbl_pemohon 
+// LEFT JOIN tbl_pendaftaran ON tbl_pemohon.id_daftar = tbl_pendaftaran.id_daftar 
+// LEFT JOIN tbl_pegawai ON tbl_pendaftaran.id_pegawai = tbl_pegawai.id_pegawai
+// LEFT JOIN tbl_user ON tbl_pemohon.kode_user = tbl_user.kode_user
+// WHERE tbl_pemohon.status_pemohon='Di Verifikasi'";
+// $resultMemanggil = mysqli_query($conn, $queryMemanggil);
+
+
+$query_pegawai = "SELECT COUNT(*) AS jumlah_pegawai FROM tbl_pegawai";
+$result_pegawai = mysqli_query($conn, $query_pegawai);
+$row_pegawai = mysqli_fetch_assoc($result_pegawai);
+$jumlah_pegawai = $row_pegawai['jumlah_pegawai'];
+
+// $query_tamu = "SELECT COUNT(*) AS jumlah_tamu FROM tamu";
+// $result_tamu = mysqli_query($conn, $query_tamu);
+// $row_tamu = mysqli_fetch_assoc($result_tamu);
+// $jumlah_tamu = $row_tamu['jumlah_tamu'];
 
 //query tampilan data mahasiswa
 // $query = "SELECT * FROM mahasiswa";
 // $result = mysqli_query($conn, $query);
 
+$id = $_SESSION["id"];
+$query_user = "SELECT * FROM tbl_pengguna WHERE id = $id";
+$result_user = mysqli_query($conn, $query_user);
+$row_user = mysqli_fetch_assoc($result_user);
+
 ?>
 <!DOCTYPE html>
-<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -27,8 +49,24 @@ include '../koneksi.php';
     <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" href="../plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" href="../plugins/chart.js/Chart.bundle.min.js">
+    <link rel="stylesheet" href="../plugins/chart.js/Chart.bundle.js">
     <link rel="stylesheet" href="../plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
     <link rel="stylesheet" href="../dist/css/adminlte.min.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.17.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Font Awesome -->
+
+    <!-- Theme Style CSS -->
+    <link rel="stylesheet" href="../tema/dark-theme.css" />
+    <link rel="stylesheet" href="../tema/semi-dark.css" />
+    <link rel="stylesheet" href="../tema/header-colors.css" />
+
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -45,7 +83,7 @@ include '../koneksi.php';
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Sistem Informasi Data Tamu</h1>
+
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
@@ -54,139 +92,141 @@ include '../koneksi.php';
                             </ol>
                         </div>
                     </div>
+                    <marquee>
+                        <h1>Selamat Datang Di Aplikasi Buku Tamu</h1>
+                    </marquee>
                 </div><!-- /.container-fluid -->
-            </section>
+                <!-- Main content -->
+                <section class="content">
+                    <style>
+                        .bg-info {
+                            background: linear-gradient(to right, #3498db, #ffc0cb);
+                            /* Change the color codes as needed */
+                            color: #fff;
+                            /* Set text color to white or another contrasting color */
+                        }
 
-            <!-- Main content -->
-            <section class="content">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-lg-3 col-6">
-                            <!-- small card -->
-                            <div class="small-box bg-info">
-                                <div class="inner">
-                                    <h3>150</h3>
+                        .bg-success {
+                            background: linear-gradient(to right, #3498db, #ff66b2);
+                            /* Change the color codes as needed */
+                            color: #fff;
+                            /* Set text color to white or another contrasting color */
+                        }
 
-                                    <p>New Orders</p>
+                        .bg-warning {
+                            background: linear-gradient(to right, #3498db, #ff6b81);
+                            /* Change the color codes as needed */
+                            color: #fff;
+                            /* Set text color to white or another contrasting color */
+                        }
+                    </style>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-lg-4 col-6">
+                                <!-- small card -->
+                                <div class="small-box bg-success">
+                                    <div class="inner">
+                                        <h3><?php echo $jumlah_pegawai; ?></h3>
+                                        <p>Pegawai</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="fas fa-user-plus"></i>
+                                    </div>
+                                    <a href="pegawai.php" class="small-box-footer">
+                                        More info<i class="fas fa-arrow-circle-right"></i>
+                                    </a>
                                 </div>
-                                <div class="icon">
-                                    <i class="fas fa-shopping-cart"></i>
-                                </div>
-                                <a href="#" class="small-box-footer">
-                                    More info <i class="fas fa-arrow-circle-right"></i>
-                                </a>
                             </div>
-                        </div>
-                        <!-- ./col -->
-                        <div class="col-lg-3 col-6">
-                            <!-- small card -->
-                            <div class="small-box bg-success">
-                                <div class="inner">
-                                    <h3>53<sup style="font-size: 20px">%</sup></h3>
-
-                                    <p>Bounce Rate</p>
+                            <div class="col-lg-4 col-6">
+                                <!-- small card -->
+                                <div class="small-box bg-info">
+                                    <div class="inner">
+                                        <h3><?php echo $jumlah_pemohon; ?></h3>
+                                        <p>Pemohon</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="fas fa-user-plus"></i>
+                                    </div>
+                                    <a href="pemohon.php" class="small-box-footer">
+                                        More info<i class="fas fa-arrow-circle-right"></i>
+                                    </a>
                                 </div>
-                                <div class="icon">
-                                    <i class="ion ion-stats-bars"></i>
-                                </div>
-                                <a href="#" class="small-box-footer">
-                                    More info <i class="fas fa-arrow-circle-right"></i>
-                                </a>
                             </div>
-                        </div>
-                        <!-- ./col -->
-                        <div class="col-lg-3 col-6">
-                            <!-- small card -->
-                            <div class="small-box bg-warning">
-                                <div class="inner">
-                                    <h3>44</h3>
 
-                                    <p>User Registrations</p>
+                            <div class="col-lg-4 col-6">
+                                <!-- small card -->
+                                <div class="small-box bg-warning">
+                                    <div class="inner">
+                                        <h3><?php echo $jumlah_pemohon1; ?></h3>
+                                        <p>Tamu</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="fas fa-user-plus"></i>
+                                    </div>
+                                    <a href="tamu.php" class="small-box-footer">
+                                        More info<i class="fas fa-arrow-circle-right"></i>
+                                    </a>
                                 </div>
-                                <div class="icon">
-                                    <i class="fas fa-user-plus"></i>
-                                </div>
-                                <a href="#" class="small-box-footer">
-                                    More info <i class="fas fa-arrow-circle-right"></i>
-                                </a>
                             </div>
-                        </div>
-                        <!-- ./col -->
-                        <div class="col-lg-3 col-6">
-                            <!-- small card -->
-                            <div class="small-box bg-danger">
-                                <div class="inner">
-                                    <h3>65</h3>
 
-                                    <p>Unique Visitors</p>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-chart-pie"></i>
-                                </div>
-                                <a href="#" class="small-box-footer">
-                                    More info <i class="fas fa-arrow-circle-right"></i>
-                                </a>
-                            </div>
+                            <section class="content">
+                                <div class="container-fluid">
+                                    <div class="row">
+
+                                        <div class="col-lg-6 col-6">
+                                            <div class="card card-primary">
+                                                <div class="card-header">
+                                                    <h3 class="card-title">KONSUMSI</h3>
+                                                    <div class="card-tools">
+                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                                            <i class="fas fa-minus"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="card-body">
+                                                    <canvas id="donutChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                                </div>
+                                                <!-- /.card-body -->
+                                            </div>
+                                        </div>
+
+                                        <!-- ./col -->
+                                        <div class="col-lg-6 col-6">
+                                            <!-- small card -->
+                                            <div class="card card-primary">
+                                                <div class="card-header">
+                                                    <h3 class="card-title">STATUS</h3>
+                                                    <div class="card-tools">
+                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                                            <i class="fas fa-minus"></i>
+                                                        </button>
+
+                                                    </div>
+                                                </div>
+                                                <div class="card-body">
+                                                    <canvas id="donutChart2" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                                </div>
+                                                <!-- /.card-body -->
+                                            </div>
+                                            <!-- ./col -->
+                                        </div>
+                                    </div>
+                                    <!-- /.container-fluid -->
+                            </section>
+
+
                         </div>
-                        <!-- ./col -->
+
                     </div>
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3 class="card-title">DataTable with default features</h3>
-                                </div>
-                                <!-- /.card-header -->
-                                <div class="card-body">
-                                    <table id="example1" class="table table-bordered table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>Rendering engine</th>
-                                                <th>Browser</th>
-                                                <th>Platform(s)</th>
-                                                <th>Engine version</th>
-                                                <th>CSS grade</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>Trident</td>
-                                                <td>Internet
-                                                    Explorer 4.0
-                                                </td>
-                                                <td>Win 95+</td>
-                                                <td>4</td>
-                                                <td>X</td>
-                                            </tr>
-                                        </tbody>
-                                        <tfoot>
-                                            <tr>
-                                                <th>Rendering engine</th>
-                                                <th>Browser</th>
-                                                <th>Platform(s)</th>
-                                                <th>Engine version</th>
-                                                <th>CSS grade</th>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
-                                </div>
-                                <!-- /.card-body -->
-                            </div>
-                            <!-- /.card -->
-                        </div>
-                        <!-- /.col -->
-                    </div>
-                    <!-- /.row -->
-                </div>
-                <!-- /.container-fluid -->
-            </section>
-            <!-- /.content -->
+                    <!-- /.container-fluid -->
+                    <!-- /.content -->
         </div>
         <!-- /.content-wrapper -->
 
         <?php include "theme-footer.php"; ?>
 
     </div>
+
     <!-- ./wrapper -->
 
     <!-- JQuery -->
@@ -230,6 +270,84 @@ include '../koneksi.php';
             });
         });
     </script>
+
+    <?php
+    $dataPoints = array();
+    $dataPoints2 = array();
+
+    $result = $conn->query("SELECT * FROM tbl_konsumsi");
+    $result2 = $conn->query("SELECT COUNT(status_pemohon) as status2, status_pemohon FROM tbl_pemohon GROUP BY status_pemohon");
+
+    while ($row = $result->fetch_assoc()) {
+        $dataPoints[] = $row;
+    }
+
+    while ($row2 = $result2->fetch_assoc()) {
+        $dataPoints2[] = $row2;
+    }
+    $conn->close();
+    ?>
+
+    <script>
+        // Get context with jQuery - using jQuery's .get() method.
+        var donutChartCanvas = $("#donutChart").get(0).getContext("2d");
+        var donutData = {
+            labels: <?php echo json_encode(array_column($dataPoints, 'tbl_konsumsi')); ?>,
+            datasets: [{
+                data: <?php echo json_encode(array_column($dataPoints, 'total_konsumsi')); ?>,
+                backgroundColor: [
+                    "#f56954",
+                    "#00a65a",
+                    "#f39c12",
+                    "#00c0ef",
+                    "#3c8dbc",
+                    "#d2d6de",
+                ],
+            }, ],
+        };
+        var donutOptions = {
+            maintainAspectRatio: false,
+            responsive: true,
+        };
+        //Create pie or douhnut chart
+        // You can switch between pie and douhnut using the method below.
+        new Chart(donutChartCanvas, {
+            type: "doughnut",
+            data: donutData,
+            options: donutOptions,
+        });
+    </script>
+
+    <script>
+        // Get context with jQuery - using jQuery's .get() method.
+        var donutChartCanvas = $("#donutChart2").get(0).getContext("2d");
+        var donutData = {
+            labels: <?php echo json_encode(array_column($dataPoints2, 'status_permohonan')); ?>,
+            datasets: [{
+                data: <?php echo json_encode(array_column($dataPoints2, 'status2')); ?>,
+                backgroundColor: [
+                    "grey",
+                    "blue",
+                    "red",
+                    "#00c0ef",
+                    "#3c8dbc",
+                    "#d2d6de",
+                ],
+            }, ],
+        };
+        var donutOptions = {
+            maintainAspectRatio: false,
+            responsive: true,
+        };
+        //Create pie or douhnut chart
+        // You can switch between pie and douhnut using the method below.
+        new Chart(donutChartCanvas, {
+            type: "doughnut",
+            data: donutData,
+            options: donutOptions,
+        });
+    </script>
+
 </body>
 
 </html>

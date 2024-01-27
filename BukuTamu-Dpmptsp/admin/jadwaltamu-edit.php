@@ -1,33 +1,25 @@
 <?php
-session_start();
-if ($_SESSION["peran"] == "USER") {
-    header("Location: logout.php");
-    exit;
-}
-if (!isset($_SESSION["login"])) {
-    header("Location: ../index.php");
-    exit;
-}
+include "untuk-sesi.php";
 
-include '../koneksi.php';
+$id_daftar = $_GET["id_daftar"];
+$query_pendaftaran = "SELECT * FROM tbl_pendaftaran WHERE id_daftar = $id_daftar";
+$result_pendaftaran = mysqli_query($conn, $query_pendaftaran);
+$row_pendaftaran = mysqli_fetch_assoc($result_pendaftaran);
 
-$id = $_GET["id"];
-$query_jadwaltamu = "SELECT * FROM jadwaltamu WHERE id = $id";
-$result_jadwaltamu = mysqli_query($conn, $query_jadwaltamu);
-$row_jadwaltamu = mysqli_fetch_assoc($result_jadwaltamu);
-
-//query tampilan data jadwaltamu
+//query tampilan data pendaftaran
 if (isset($_POST["submit"])) {
-    $nama_instansi = htmlspecialchars($_POST["nama_instansi"]);
-    $tanggal = htmlspecialchars($_POST["tanggal"]);
-    $jam = htmlspecialchars($_POST["jam"]);
-    
+    $id_pegawai = htmlspecialchars($_POST["id_pegawai"]);
+    $tanggal_daftar = htmlspecialchars($_POST["tanggal_daftar"]);
+    $jam_daftar = htmlspecialchars($_POST["jam_daftar"]);
+    $status_daftar = htmlspecialchars($_POST["status_daftar"]);
 
-    $query = "UPDATE jadwaltamu SET
-            nama_instansi = '$nama_instansi',
-            tanggal= '$tanggal',
-            jam= '$jam'
-            WHERE id = $id
+
+    $query = "UPDATE tbl_pendaftaran SET
+            id_pegawai = '$id_pegawai',
+            tanggal_daftar= '$tanggal_daftar',
+            jam_daftar= '$jam_daftar',
+            status_daftar= '$status_daftar'
+            WHERE id_daftar = $id_daftar
             ";
     $edit = mysqli_query($conn, $query);
 
@@ -39,7 +31,7 @@ if (isset($_POST["submit"])) {
     } else {
         echo "<script type='text/javascript'>
             alert('Data GAGAL diedit...!');
-            document.location.href = 'jadwaltamu-edit.php?id=$id';
+            document.location.href = 'jadwaltamu-edit.php?id_daftar=$id_daftar';
             </script>";
     }
 }
@@ -51,7 +43,7 @@ if (isset($_POST["submit"])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Edit Data Tamu | DPMPTSP KOTA BANJARMASIN</title>
+    <title>Edit Jadwal Kunjungan | DPMPTSP KOTA BANJARMASIN</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="../dist/css/adminlte.min.css">
@@ -71,12 +63,12 @@ if (isset($_POST["submit"])) {
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Jadwal Tamu</h1>
+                            <h1>Mengatur Jadwal</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="index.php">Home</a></li>
-                                <li class="breadcrumb-item"><a href="jadwaltamu.php">Jadwal Tamu</a></li>
+                                <li class="breadcrumb-item"><a href="pendaftaran.php">Mengatur Jadwal</a></li>
                                 <li class="breadcrumb-item active">Edit Data</li>
                             </ol>
                         </div>
@@ -99,18 +91,39 @@ if (isset($_POST["submit"])) {
                                 <form action="" method="post">
                                     <div class="card-body">
                                         <div class="form-group">
-                                            <label for="nama_instansi">Nama Instansi :</label>
-                                            <input type="text" class="form-control" id="nama_instansi" name="nama_instansi" value="<?= $row_jadwaltamu["nama_instansi"]; ?>" placeholder="Masukkan Nama tamu" required>   
-                                            <label for="tanggal">Tanggal :</label>
-                                            <input type="date" class="form-control" id="tanggal" name="tanggal" value="<?= $row_jadwaltamu["tanggal"]; ?>" placeholder="Masukkan Tanggal In Bertamu" required>    
-                                            <label for="jam">Jam :</label>
-                                            <input type="time" class="form-control" id="jam" name="jam" value="<?= $row_jadwaltamu["jam"]; ?>" placeholder="Jam ingin berkunjung" required>    
-                                                                                 
+                                            <select class="form-control" name="id_pegawai">
+                                                <?php
+                                                $query_pegawai = "SELECT * FROM tbl_pegawai";
+                                                $result_pegawai = mysqli_query($conn, $query_pegawai);
+
+                                                while ($row_pegawai = mysqli_fetch_assoc($result_pegawai)) {
+                                                    $selected = ($row_pemohon["id_pegawai"] == $row_pegawai['id_pegawai']) ? "selected" : "";
+                                                ?>
+                                                    <option value="<?php echo $row_pegawai['id_pegawai']; ?>" <?php echo $selected; ?>>
+                                                        <?php echo $row_pegawai["nama_pegawai"]; ?>
+                                                    </option>
+                                                <?php } ?>
+                                            </select>
+                                            <!-- <input type="hidden" class="form-control" id="id_pegawai" name="id_pegawai" value="<?php echo $row_pemohon["id_pegawai"]; ?>" placeholder="Nama Bagian/Bidang" required> -->
+
+                                            <label for="tanggal_daftar">Tanggal :</label>
+                                            <input type="date" class="form-control" id="tanggal_daftar" name="tanggal_daftar" value="<?= $row_pendaftaran["tanggal_daftar"]; ?>" placeholder="Masukkan tanggal_daftar In Bertamu" required>
+
+                                            <label class="form-label" for="jam_daftar">Jam sebelumnya : <?= $row_pendaftaran["jam_daftar"]; ?> </label><br>
+                                            <label class="form-label" for="jam_daftar">Perbaharui Jam :</label>
+                                            <input type="time" class="form-control" id="jam_daftar" name="jam_daftar" value="<?= $row_pendaftaran["jam_daftar"]; ?>" required>
+
+                                            <label for="status_daftar">Status :</label>
+                                            <select class="form-control" id="status_daftar" name="status_daftar" required>
+                                                <option value="1" <?php echo ($row_pendaftaran["status_daftar"] == 1) ? 'selected' : ''; ?>>Ada</option>
+                                                <option value="2" <?php echo ($row_pendaftaran["status_daftar"] == 2) ? 'selected' : ''; ?>>Full</option>
+                                            </select>
+
                                         </div>
                                     </div>
                                     <div class="card-footer">
                                         <button type="submit" name="submit" class="btn btn-primary mr-1">Simpan</button>
-                                        <a href="jadwaltamu.php" class="btn btn-secondary">Batal</a>
+                                        <a href="pendaftaran.php" class="btn btn-secondary">Batal</a>
                                     </div>
                                 </form>
                             </div>

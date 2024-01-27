@@ -11,12 +11,30 @@ if (!isset($_SESSION["login"])) {
 
 include '../koneksi.php';
 
-//query tampilan data jadwaltamu
+$kd_user = $_SESSION["kode_pengguna"];
+$id_daftar = $_GET["id_daftar"];
+
+$query = "SELECT * FROM tbl_pendaftaran
+            LEFT JOIN tbl_pegawai ON tbl_pendaftaran.id_pegawai = tbl_pegawai.id_pegawai WHERE id_daftar = $id_daftar";
+$result = mysqli_query($conn, $query);
+$rowPegawai = mysqli_fetch_assoc($result);
+
 if (isset($_POST["submit"])) {
-    $nama_instansi = htmlspecialchars($_POST["nama_instansi"]);
-    $tanggal = htmlspecialchars($_POST["tanggal"]);
-    $jam = htmlspecialchars($_POST["jam"]);
-    $query = "INSERT INTO jadwaltamu VALUES ('', '$nama_instansi', '$tanggal', '$jam')";
+
+    $asal_pemohon = htmlspecialchars($_POST["asal_pemohon"]);
+    $namarekan_pemohon = htmlspecialchars($_POST["namarekan_pemohon"]);
+    $jumlahtamu_pemohon = htmlspecialchars($_POST["jumlahtamu_pemohon"]);
+    $perihal_pemohon = htmlspecialchars($_POST["perihal_pemohon"]);
+    $status_pemohon = "Menunggu";
+    $alasan = "";
+
+
+    $surat_pemohon = $_FILES["surat_pemohon"]["name"];
+
+    move_uploaded_file($_FILES['surat_pemohon']['tmp_name'], '../assets/files/' . $surat_pemohon);
+
+
+    $query = "INSERT INTO tbl_pemohon VALUES ('', '$id_daftar', '$kd_user', '$asal_pemohon', '$namarekan_pemohon', '$jumlahtamu_pemohon', '$perihal_pemohon', '$surat_pemohon', '$status_pemohon', '$alasan')";
     $simpan = mysqli_query($conn, $query);
 
     if ($simpan) {
@@ -39,7 +57,7 @@ if (isset($_POST["submit"])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Tambah Data jadwal Tamu | DPMPTSP KOTA BANJARMASIN</title>
+    <title>Tambah Data Pemohon | DPMPTSP</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="../dist/css/adminlte.min.css">
@@ -59,13 +77,13 @@ if (isset($_POST["submit"])) {
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Jadwal Tamu</h1>
+                            <h1>Silahkan Isi Form Ini</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="index.php">Home</a></li>
-                                <li class="breadcrumb-item"><a href="jadwaltamu.php">Data Tamu</a></li>
-                                <li class="breadcrumb-item active">Tambah Data</li>
+                                <li class="breadcrumb-item"><a href="pemohon.php">pemohon</a></li>
+                                <li class="breadcrumb-item active">Tambah Pemohon</li>
                             </ol>
                         </div>
                     </div>
@@ -84,21 +102,45 @@ if (isset($_POST["submit"])) {
                                 </div>
                                 <!-- /.card-header -->
                                 <!-- form start -->
-                                <form action="" method="post">
+                                <form action="" method="post" enctype="multipart/form-data">
                                     <div class="card-body">
-                                        <div class="form-group">
-                                            <label for="nama_instansi">Nama Instansi :</label>
-                                            <input type="text" class="form-control" id="nama_instansi" name="nama_instansi" placeholder="Masukkan Nama instansi" required>
-                                            <label for="tanggal">Tanggal :</label>
-                                            <input type="date" class="form-control" id="tanggal" name="tanggal" placeholder="Masukkan Tanggal" required>
-                                            <label for="jam">Jam :</label>
-                                            <input type="time" class="form-control" id="jam" name="jam" placeholder="Masukkan Jam Untuk Berkunjung " required>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer">
-                                        <button type="submit" name="submit" class="btn btn-primary mr-1">Simpan</button>
-                                        <a href="jadwaltamu.php" class="btn btn-secondary">Batal</a>
-                                    </div>
+
+                                        <div class="card-body">
+                                            <div class="form-group">
+                                                <label for="id_pegawai"> Pegawai : <?= $rowPegawai["nama_pegawai"] ?></label>
+
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="tanggal">Tanggal : <?= $rowPegawai["tanggal_daftar"] ?></label>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="asal_pemohon">Asal Instansi :</label>
+                                                <input type="text" class="form-control" id="asal_pemohon" name="asal_pemohon" placeholder="Masukkan Asal Instansi Anda" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="namarekan_pemohon">Nama Tamu :</label>
+                                                <input type="text" class="form-control" id="namarekan_pemohon" name="namarekan_pemohon" placeholder="Masukkan Nama Rekan Anda" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="jumlahtamu_pemohon">Jumlah Tamu :</label>
+                                                <input type="text" class="form-control" id="jumlahtamu_pemohon" name="jumlahtamu_pemohon" placeholder="Masukkan Jumlah Tamu yang akan datang" required>
+                                            </div>
+                                            <!-- <div class="form-group">
+                                                <label for="no_hp">No Handphone :</label>
+                                                <input type="text" class="form-control" id="no_hp" name="no_hp" placeholder="Masukkan No Handphone Yang Aktif" required>
+                                            </div> -->
+                                            <div class="form-group">
+                                                <label for="perihal_pemohon">Perihal Kunjungan :</label>
+                                                <input type="text" class="form-control" id="perihal_pemohon" name="perihal_pemohon" placeholder="Masukkan Perihal Kunjungan datang ke Instansi" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="surat_pemohon">Surat Permohonan :</label>
+                                                <input type="file" class="form-control" id="surat_pemohon" name="surat_pemohon" required>
+                                            </div>
+                                            <div class="card-footer">
+                                                <button type="submit" name="submit" class="btn btn-primary mr-1">Kirim</button>
+                                                <a href="pemohon.php" class="btn btn-secondary">Batal</a>
+                                            </div>
                                 </form>
                             </div>
                         </div>
@@ -121,43 +163,8 @@ if (isset($_POST["submit"])) {
     <script src="../plugins/jquery/jquery.min.js"></script>
     <!-- Bootstrap 4 -->
     <script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <!-- DataTablles & Plugins -->
-    <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
-    <script src="../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-    <script src="../plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-    <script src="../plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-    <script src="../plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
-    <script src="../plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
-    <script src="../plugins/jszip/jszip.min.js"></script>
-    <script src="../plugins/pdfmake/pdfmake.min.js"></script>
-    <script src="../plugins/pdfmake/vfs_fonts.js"></script>
-    <script src="../plugins/datatables-buttons/js/buttons.html5.min.js"></script>
-    <script src="../plugins/datatables-buttons/js/buttons.print.min.js"></script>
-    <script src="../plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
     <!-- AdminLTE App -->
     <script src="../dist/js/adminlte.min.js"></script>
-    <!-- AdminLTE for demo purposes -->
-    <script src="../dist/js/demo.js"></script>
-    <!-- Page specific script -->
-    <script>
-        $(function() {
-            $("#example1").DataTable({
-                "responsive": true,
-                "lengthChange": false,
-                "autoWidth": false,
-                "buttons": ["copy", "csv", "excel", "pdf", "print"]
-            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-            $('#example2').DataTable({
-                "paging": true,
-                "lengthChange": false,
-                "searching": false,
-                "ordering": true,
-                "info": true,
-                "autoWidth": false,
-                "responsive": true,
-            });
-        });
-    </script>
 </body>
 
 </html>

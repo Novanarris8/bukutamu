@@ -1,0 +1,10 @@
+/* css untuk paragraf */
+
+.paragraf-satu {
+  color: rgb(0, 0, 0);
+  background-color: #eee;
+  font-size: 14px;
+  /* font-weight: bold; */
+  padding: 10px;
+  margin: 0;
+}

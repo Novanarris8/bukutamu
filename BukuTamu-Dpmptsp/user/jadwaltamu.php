@@ -1,6 +1,9 @@
 <?php
+include "../koneksi.php";
+
 session_start();
-if ($_SESSION["peran"] == "USER") {
+
+if ($_SESSION["peran"] == "ADMIN") {
     header("Location: logout.php");
     exit;
 }
@@ -9,11 +12,9 @@ if (!isset($_SESSION["login"])) {
     exit;
 }
 
-include '../koneksi.php';
-
-$query = "SELECT * FROM daftartamu";
+$query = "SELECT * FROM tbl_pendaftaran Pen 
+          LEFT JOIN tbl_pegawai Peg ON Pen.id_pegawai = Peg.id_pegawai";
 $result = mysqli_query($conn, $query);
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -21,7 +22,7 @@ $result = mysqli_query($conn, $query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Data Daftar Tamu | DPMPTSP KOTA BANJARMASIN</title>
+    <title>Daftar Pemohon | DPMPTSP</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="../plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
@@ -30,83 +31,90 @@ $result = mysqli_query($conn, $query);
     <link rel="stylesheet" href="../dist/css/adminlte.min.css">
 </head>
 
-<body class= "hold-transition sidebar-mini">
+<body class="hold-transition sidebar-mini">
     <div class="wrapper">
 
-    <?php include "theme-header.php"; ?>
+        <?php include "theme-header.php"; ?>
 
-    <?php include "theme-sidebar.php"; ?>
+        <?php include "theme-sidebar.php"; ?>
 
-    <!-- Content Wrapper. Contains page content -->
-    <div class="content-wrapper">
-    <!-- Content Header (page header) -->
-    <section class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1>Data Daftar Tamu</h1>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="index.php">Home</a></li>
-                    <li class="breadcrumb-item active">Daftar Tamu</li>
-                    </ol>
-                </div>
-            </div>
-        </div><!-- /.container-fluid -->
-    </section>
-
-    <!-- Main content -->
-    <section class="content">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                <a href="daftartamu-tambah.php" class="btn btn-primary"><i class="fa fa-plus-circle"></i> Tambah Data</a>
-                    </div>
-                    <!-- /.card-header -->
-                    <div class="card-body">
-                        <table id="example1" class="table table-bordered table-striped">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Nama Instansi</th>
-                                    <th>Nama Tamu</th>
-                                    <th>Waktu</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php $no = 1;
-                                while ($row = mysqli_fetch_assoc($result)) { ?>
-                                    <tr>
-                                        <td><?php echo $no; ?></td>
-                                        <td><?php echo $row["nama_instansi"]; ?></td>
-                                        <td><?php echo $row["nama_tamu"]; ?></td>
-                                        <td><?php echo $row["tanggal"]; ?><?php echo $row["jam"]; ?></td>
-                                        <td></td>
-                                        </td>
-                                    </tr>
-                                <?php $no++;
-                                } ?>
-                            </tbody>
-                        </table>
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <!-- Content Header (page header) -->
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>Cek Jadwal Ketersediaan Kunjungan </h1>
+                            <h1>DPMPTSP Kota Banjarmasin</h1>
                         </div>
-                        <!-- /.card-body -->
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="index.php">Home</a></li>
+                                <li class="breadcrumb-item active">Pemohon</li>
+                            </ol>
+                        </div>
                     </div>
-                    <!-- /.card -->
-                </div>
-                <!-- /.col -->
-            </div>
-            <!-- /.row -->
-        </div>
-        <!-- /.container-fluid -->
-    </section>
-    <!-- /.content -->
-    </div>
-    <!-- /.content-wrapper -->
+                </div><!-- /.container-fluid -->
+            </section>
 
-    <?php include "theme-footer.php"; ?>
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <!-- <div class="card-header">
+                                    <a href="jadwaltamu-tambah.php" class="btn btn-primary"><i class="fa fa-plus-circle"></i> Tambah Data</a>
+                                </div> -->
+                                <!-- /.card-header -->
+                                <div class="card-body">
+                                    <table id="example1" class="table table-bordered table-striped">
+                                        <thead class="table-primary">
+                                            <tr>
+                                                <th>Pegawai</th>
+                                                <th>Hari</th>
+                                                <th>Jam</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php $no = 1;
+                                            $query = "SELECT * FROM tbl_pendaftaran Pen 
+                                            LEFT JOIN tbl_pegawai Peg ON Pen.id_pegawai = Peg.id_pegawai";
+                                            $result = mysqli_query($conn, $query);
+                                            while ($row = mysqli_fetch_assoc($result)) { ?>
+                                                <tr>
+                                                    <td><?php echo $row["nama_pegawai"]; ?></td>
+                                                    <td><?php echo $row["tanggal_daftar"]; ?></td>
+                                                    <td><?php echo $row["jam_daftar"]; ?></td>
+                                                    <td>
+                                                        <a href="jadwaltamu-tambah.php?id_daftar=<?= $row["id_daftar"] ?>" class="btn btn-success"><i class="fas fa-user"></i> Daftar</a>
+
+                                                    </td>
+                                                </tr>
+                                            <?php $no++;
+                                            } ?>
+                                        </tbody>
+                                    </table>
+
+
+                                </div>
+                                <!-- /.card-body -->
+                            </div>
+                            <!-- /.card -->
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+                </div>
+                <!-- /.container-fluid -->
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- /.content-wrapper -->
+
+        <?php include "theme-footer.php"; ?>
 
     </div>
     <!-- ./wrapper -->
@@ -133,25 +141,19 @@ $result = mysqli_query($conn, $query);
     <!-- AdminLTE for demo purposes -->
     <script src="../dist/js/demo.js"></script>
     <!-- Page specific script -->
-    <script>
+    <!-- <script>
         $(function() {
             $("#example1").DataTable({
                 "responsive": true,
                 "lengthChange": false,
                 "autoWidth": false,
-                "buttons": ["copy", "csv", "excel", "pdf", "print"]
+                "buttons": ["copy", "csv", "excel", "pdf", "print"],
+                "order": [
+                    [0, "asc"]
+                ]
             }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-            $('#example2').DataTable({
-                "paging": true,
-                "lengthChange": false,
-                "searching": false,
-                "ordering": true,
-                "info": true,
-                "autoWidth": false,
-                "responsive": true,
-            });
-            });
-    </script>
+        });
+    </script> -->
 </body>
 
 </html>

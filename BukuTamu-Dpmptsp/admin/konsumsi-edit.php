@@ -1,56 +1,39 @@
 <?php
-session_start();
-if ($_SESSION["peran"] == "USER") {
-    header("Location: logout.php");
-    exit;
-}
-if (!isset($_SESSION["login"])) {
-    header("Location: ../index.php");
-    exit;
-}
+include "untuk-sesi.php";
 
-include '../koneksi.php';
-
-$id = $_GET["id"];
-$query_konsumsi = "SELECT * FROM konsumsi WHERE id = $id";
+$id_konsumsi = $_GET["id_konsumsi"];
+$query_konsumsi = "SELECT * FROM tbl_konsumsi K 
+            LEFT JOIN tbl_pemohon P ON K.id_pemohon = P.id_pemohon
+            LEFT JOIN tbl_pendaftaran D ON P.id_daftar = D.id_daftar
+            LEFT JOIN tbl_user U ON P.kode_user = U.kode_user WHERE id_konsumsi = $id_konsumsi";
 $result_konsumsi = mysqli_query($conn, $query_konsumsi);
 $row_konsumsi = mysqli_fetch_assoc($result_konsumsi);
 
-//query tampilan data konsumsi
 if (isset($_POST["submit"])) {
-    $tanggal = htmlspecialchars($_POST["tanggal"]);
-    $nama_instansi = htmlspecialchars($_POST["nama_instansi"]);
-    $nama_tamu = htmlspecialchars($_POST["nama_tamu"]);
-    $jumlah = htmlspecialchars($_POST["jumlah"]);
-    $konsumsi = htmlspecialchars($_POST["konsumsi"]);
-    $harga = htmlspecialchars($_POST["harga"]);
-    $total = htmlspecialchars($_POST["total"]);
 
-    $query = "UPDATE konsumsi SET
-            tanggal = '$tanggal',
-            nama_instansi = '$nama_instansi',
-            nama_tamu = '$nama_tamu',
-            jumlah = '$jumlah',
-            konsumsi = '$konsumsi',
-            harga = '$harga',
-            total = '$total'
-            WHERE id = $id
-            ";
+    $makanan_konsumsi = htmlspecialchars($_POST["makanan_konsumsi"]);
+    $harga_konsumsi = htmlspecialchars($_POST["harga_konsumsi"]);
+    $total_konsumsi = htmlspecialchars($_POST["total_konsumsi"]);
+
+    $query = "UPDATE tbl_konsumsi SET 
+            makanan_konsumsi = '$makanan_konsumsi', 
+            harga_konsumsi = '$harga_konsumsi', 
+            total_konsumsi = '$total_konsumsi'
+            WHERE id_konsumsi = $id_konsumsi";
     $edit = mysqli_query($conn, $query);
 
     if ($edit) {
-        echo "<script type='text/javascript'>
-            alert('Data berhasil diedit...!');
-            document.location.href = 'konsumsi.php';
+        echo "<script type='text/javascript'> 
+            alert('Data berhasil diedit...!'); 
+            document.location.href = 'konsumsi.php'; 
             </script>";
     } else {
-        echo "<script type='text/javascript'>
-            alert('Data GAGAL diedit...!');
-            document.location.href = 'konsumsi-edit.php?id=$id';
+        echo "<script type='text/javascript'> 
+            alert('Data GAGAL diedit...!'); 
+            document.location.href = 'konsumsi-edit.php?id_konsumsi=$id_konsumsi'; 
             </script>";
     }
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -58,7 +41,7 @@ if (isset($_POST["submit"])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Edit Data konsumsi | DPMPTSP KOTA BANJARMASIN</title>
+    <title>Edit Data Konsumsi | PRAKTIKUM FTI UNISKA</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="../dist/css/adminlte.min.css">
@@ -78,13 +61,13 @@ if (isset($_POST["submit"])) {
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Data konsumsi</h1>
+                            <h1>Data Konsumsi</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="index.php">Home</a></li>
-                                <li class="breadcrumb-item"><a href="konsumsi.php">konsumsi</a></li>
-                                <li class="breadcrumb-item active">Edit Data</li>
+                                <li class="breadcrumb-item"><a href="pemohon.php">Konsumsi</a></li>
+                                <li class="breadcrumb-item active">Edit Konsumsi</li>
                             </ol>
                         </div>
                     </div>
@@ -106,26 +89,26 @@ if (isset($_POST["submit"])) {
                                 <form action="" method="post">
                                     <div class="card-body">
                                         <div class="form-group">
-                                            <label for="tanggal">Tanggal :</label>
-                                            <input type="date" class="form-control" id="tanggal" name="tanggal" value="<?= $row_konsumsi["tanggal"]; ?>" placeholder="Masukkan tanggal" required>
-                                            <label for="nama_instansi">Nama Instansi :</label>
-                                            <input type="text" class="form-control" id="nama_instansi" name="nama_instansi" value="<?= $row_konsumsi["nama_instansi"]; ?>" placeholder="Masukkan Nama tamu" required>
-                                            <label for="nama_tamu">Nama Tamu:</label>
-                                            <input type="text" class="form-control" id="nama_tamu" name="nama_tamu" value="<?= $row_konsumsi["nama_tamu"]; ?>" placeholder="Masukkan No HP" required>
-                                            <label for="jumlah">Jumlah Tamu :</label>
-                                            <input type="text" class="form-control" id="jumlah" name="jumlah" value="<?= $row_konsumsi["jumlah"]; ?>" placeholder="Masukkan jumlah Tamu Yang Berkunjung" required>
-                                            <label for="konsumsi">Konsumsi :</label>
-                                            <input type="text" class="form-control" id="konsumsi" name="konsumsi" value="<?= $row_konsumsi["konsumsi"]; ?>" placeholder="Masukkan Konsumsi Yang di Sediakan" required>
-                                            <label for="harga">Harga :</label>
-                                            <input type="text" class="form-control" id="harga" name="harga" value="<?= $row_konsumsi["harga"]; ?>" placeholder="Masukkan harga Per Pcs Konsumsi" required>    
-                                            <label for="total">Total :</label>
-                                            <input type="text" class="form-control" id="total" name="total" value="<?= $row_konsumsi["total"]; ?>" placeholder="Total Keseluruhan" required>                                          
+                                            <label for="jumlahtamu_pemohon">Jumlah:</label>
+                                            <input type="number" class="form-control" step="any" min="0" id="jumlahtamu_pemohon" name="jumlahtamu_pemohon" value="<?php echo $row_konsumsi["jumlahtamu_pemohon"]; ?>" readonly>
                                         </div>
-                                    </div>
-                                    <div class="card-footer">
-                                        <button type="submit" name="submit" class="btn btn-primary mr-1">Simpan</button>
-                                        <a href="konsumsi.php" class="btn btn-secondary">Batal</a>
-                                    </div>
+                                        <div class="form-group">
+                                            <label for="makanan_konsumsi">Konsumsi:</label>
+                                            <input type="text" class="form-control" id="makanan_konsumsi" name="makanan_konsumsi" value="<?php echo $row_konsumsi["makanan_konsumsi"]; ?>" placeholder="Nama Bagian/Bidang" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="harga_konsumsi">Harga:</label>
+                                            <input type="number" step="any" min="0" id="harga" name="harga_konsumsi" value="<?php echo $row_konsumsi["harga_konsumsi"]; ?>" class="form-control" required autocomplete="off">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="total_konsumsi">Total :</label>
+                                            <input type="text" class="form-control" id="total" name="total_konsumsi" value="<?php echo $row_konsumsi["total_konsumsi"]; ?>" placeholder="Nama Bagian/Bidang" required>
+                                        </div>
+
+                                        <div class="card-footer">
+                                            <button type="submit" name="submit" class="btn btn-primary mr-1">Simpan</button>
+                                            <a href="konsumsi.php" class="btn btn-secondary">Batal</a>
+                                        </div>
                                 </form>
                             </div>
                         </div>
@@ -148,43 +131,24 @@ if (isset($_POST["submit"])) {
     <script src="../plugins/jquery/jquery.min.js"></script>
     <!-- Bootstrap 4 -->
     <script src="../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <!-- DataTablles & Plugins -->
-    <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
-    <script src="../plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-    <script src="../plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-    <script src="../plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-    <script src="../plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
-    <script src="../plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
-    <script src="../plugins/jszip/jszip.min.js"></script>
-    <script src="../plugins/pdfmake/pdfmake.min.js"></script>
-    <script src="../plugins/pdfmake/vfs_fonts.js"></script>
-    <script src="../plugins/datatables-buttons/js/buttons.html5.min.js"></script>
-    <script src="../plugins/datatables-buttons/js/buttons.print.min.js"></script>
-    <script src="../plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
     <!-- AdminLTE App -->
     <script src="../dist/js/adminlte.min.js"></script>
-    <!-- AdminLTE for demo purposes -->
-    <script src="../dist/js/demo.js"></script>
-    <!-- Page specific script -->
-    <script>
-        $(function() {
-            $("#example1").DataTable({
-                "responsive": true,
-                "lengthChange": false,
-                "autoWidth": false,
-                "buttons": ["copy", "csv", "excel", "pdf", "print"]
-            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-            $('#example2').DataTable({
-                "paging": true,
-                "lengthChange": false,
-                "searching": false,
-                "ordering": true,
-                "info": true,
-                "autoWidth": false,
-                "responsive": true,
-            });
-        });
-    </script>
 </body>
+
+<script type="text/javascript">
+    $("#jumlahtamu_pemohon").keyup(function() {
+        var a = parseFloat($("#jumlahtamu_pemohon").val());
+        var b = parseFloat($("#harga").val());
+        var d = a * b;
+        $("#total").val(d);
+    });
+
+    $("#harga").keyup(function() {
+        var a = parseFloat($("#jumlahtamu_pemohon").val());
+        var b = parseFloat($("#harga").val());
+        var d = a * b;
+        $("#total").val(d);
+    });
+</script>
 
 </html>

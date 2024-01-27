@@ -10,11 +10,11 @@ if (!isset($_SESSION["login"])) {
     exit;
 }
 
-// $id = $_SESSION["id"];
+$id = $_SESSION["id"];
 
-// $query_user = "SELECT * FROM daftartamu WHERE id = $id";
-// $result_user = mysqli_query($conn, $query_user);
-// $row_user = mysqli_fetch_assoc($result_user);
+$query_user = "SELECT * FROM daftartamu WHERE id = $id";
+$result_user = mysqli_query($conn, $query_user);
+$row_user = mysqli_fetch_assoc($result_user);
 
 if (isset($_POST['add'])) {
     $id                 = htmlspecialchars($_POST['id']);
@@ -137,9 +137,9 @@ if (isset($_POST['add'])) {
                                             <label for="perihal_kunjungan">Perihal Kunjungan :</label>
                                             <input type="text" class="form-control" id="perihal_kunjungan" name="perihal_kunjungan" placeholder="Contoh: Studi Tiru Inovasi Manuntung" required>
                                             <label for="tanggal">Tanggal :</label>
-                                            <input type="date" class="form-control" id="tanggal" name="tanggal" placeholder="Masukkan Tanggal" required>
+                                            <input type="date" class="form-control" id="tanggal" name="tanggal" placeholder="Masukkan Tanggal Berkunjung" required>
                                             <label for="jam">Jam :</label>
-                                            <input type="time" class="form-control" id="jam" name="jam" placeholder="Masukkan Jam Untuk Berkunjung " required>
+                                            <input type="time" class="form-control" id="jam" name="jam" placeholder="Masukkan Jam Berkunjung " required>
                                             <label for="surat_permohonan">Surat Permohonan :</label>
                                             <input type="file" class="form-control" id="surat_permohonan" name="surat_permohonan" placeholder="Scan Surat Permohonan " required>
                                         </div>

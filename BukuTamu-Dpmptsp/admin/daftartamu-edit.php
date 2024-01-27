@@ -18,6 +18,7 @@ $row_daftartamu = mysqli_fetch_assoc($result_daftartamu);
 
 //query tampilan data daftartamu
 if (isset($_POST["submit"])) {
+    $kode_tamu = htmlspecialchars($_POST["kode_tamu"]);
     $nama_instansi = htmlspecialchars($_POST["nama_instansi"]);
     $nama_tamu = htmlspecialchars($_POST["nama_tamu"]);
     $jumlah = htmlspecialchars($_POST["jumlah"]);
@@ -25,10 +26,11 @@ if (isset($_POST["submit"])) {
     $perihal_kunjungan = htmlspecialchars($_POST["perihal_kunjungan"]);
     $tanggal = htmlspecialchars($_POST["tanggal"]);
     $jam = htmlspecialchars($_POST["jam"]);
-    $status = htmlspecialchars($_POST["status"]);    
+    $status = htmlspecialchars($_POST["status"]);
     $surat_permohonan = htmlspecialchars($_POST["surat_permohonan"]);
 
     $query = "UPDATE daftartamu SET
+            kode_tamu = '$kode_tamu',
             nama_instansi = '$nama_instansi',
             nama_tamu = '$nama_tamu',
             jumlah = '$jumlah',
@@ -82,7 +84,7 @@ if (isset($_POST["submit"])) {
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Data Tamu</h1>
+                            <h1>Approve Akun</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
@@ -111,7 +113,7 @@ if (isset($_POST["submit"])) {
                                     <div class="card-body">
                                         <div class="form-group">
                                             <label for="nama_instansi">Nama Instansi :</label>
-                                            <input type="text" class="form-control" id="nama_instansi" name="nama_instansi" value="<?= $row_daftartamu["nama_instansi"]; ?>" placeholder="Masukkan Nama tamu" readonly>
+                                            <input type="text" class="form-control" id="nama_instansi" name="nama_instansi" value="<?= $row_daftartamu["nama_instansi"]; ?>" placeholder="Masukkan Nama tamu" readonly autocomplete="off">
                                             <label for="nama_tamu">Nama Tamu:</label>
                                             <input type="text" class="form-control" id="nama_tamu" name="nama_tamu" value="<?= $row_daftartamu["nama_tamu"]; ?>" placeholder="Masukkan No HP" readonly>
                                             <label for="jumlah">Jumlah Tamu :</label>
@@ -119,13 +121,13 @@ if (isset($_POST["submit"])) {
                                             <label for="no_telepon">No Telepon :</label>
                                             <input type="text" class="form-control" id="no_telepon" name="no_telepon" value="<?= $row_daftartamu["no_telepon"]; ?>" placeholder="Masukkan Nomor Telephone Yang AKtif" readonly>
                                             <label for="perihal_kunjungan">Perihal Kunjungan :</label>
-                                            <input type="text" class="form-control" id="perihal_kunjungan" name="perihal_kunjungan" value="<?= $row_daftartamu["perihal_kunjungan"]; ?>" placeholder="Masukkan Perihal Kunjungan Bertamu" readonly>    
+                                            <input type="text" class="form-control" id="perihal_kunjungan" name="perihal_kunjungan" value="<?= $row_daftartamu["perihal_kunjungan"]; ?>" placeholder="Masukkan Perihal Kunjungan Bertamu" readonly>
                                             <label for="tanggal">Tanggal :</label>
-                                            <input type="date" class="form-control" id="tanggal" name="tanggal" value="<?= $row_daftartamu["tanggal"]; ?>" placeholder="Masukkan Tanggal In Bertamu" readonly>    
+                                            <input type="date" class="form-control" id="tanggal" name="tanggal" value="<?= $row_daftartamu["tanggal"]; ?>" placeholder="Masukkan Tanggal In Bertamu" readonly>
                                             <label for="jam">Jam :</label>
-                                            <input type="time" class="form-control" id="jam" name="jam" value="<?= $row_daftartamu["jam"]; ?>" placeholder="Jam ingin berkunjung" readonly>    
-                                             <!-- <label type="hidden" for="surat_permohonan">Surat Permohonan :</label> -->
-                                            <input type="hidden" class="form-control" id="surat_permohonan" name="surat_permohonan" value="<?= $row_daftartamu["surat_permohonan"]; ?>" placeholder="Scan Surat Permohonan" readonly>        
+                                            <input type="time" class="form-control" id="jam" name="jam" value="<?= $row_daftartamu["jam"]; ?>" placeholder="Jam ingin berkunjung" readonly>
+                                            <!-- <label type="hidden" for="surat_permohonan">Surat Permohonan :</label> -->
+                                            <input type="hidden" class="form-control" id="surat_permohonan" name="surat_permohonan" value="<?= $row_daftartamu["surat_permohonan"]; ?>" placeholder="Scan Surat Permohonan" readonly>
                                             <!-- <label for="status">Status :</label>
                                             <input type="text" class="form-control" id="status" name="status" value="<?= $row_daftartamu["surat_permohonan"]; ?>" placeholder="Scan Surat Permohonan" required> -->
                                             <label for="status" class="form-label">Status :</label>
@@ -139,7 +141,7 @@ if (isset($_POST["submit"])) {
                                             <input type="hidden" class="form-control" id="status" name="status" value="Terima" readonly>
                                         </div>
                                         <label for="alasan">Alasan :</label>
-                                            <input type="text" class="form-control" id="alasan" name="alasan" value="<?= $row_daftartamu["alasan"]; ?>" placeholder="Masukkan Nomor Telephone Yang AKtif" readonly>
+                                        <input type="text" class="form-control" id="alasan" name="alasan" value="<?= $row_daftartamu["alasan"]; ?>" placeholder="Masukkan Nomor Telephone Yang AKtif" readonly>
                                     </div>
                                     <div class="card-footer">
                                         <button type="submit" name="submit" class="btn btn-primary mr-1">Verifikasi</button>

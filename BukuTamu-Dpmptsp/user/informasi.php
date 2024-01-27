@@ -11,48 +11,8 @@ if (!isset($_SESSION["login"])) {
 
 include '../koneksi.php';
 
-$id = $_SESSION["id"];
-$query_daftartamu = "SELECT * FROM daftartamu WHERE id = $id";
-$result_daftartamu = mysqli_query($conn, $query_daftartamu);
-$row_daftartamu = mysqli_fetch_assoc($result_daftartamu);
-
-//query tampilan data daftartamu
-if (isset($_POST["submit"])) {
-    $nama_instansi = htmlspecialchars($_POST["nama_instansi"]);
-    $nama_tamu = htmlspecialchars($_POST["nama_tamu"]);
-    $jumlah = htmlspecialchars($_POST["jumlah"]);
-    $no_telepon = htmlspecialchars($_POST["no_telepon"]);
-    $perihal_kunjungan = htmlspecialchars($_POST["perihal_kunjungan"]);
-    $waktu = htmlspecialchars($_POST["waktu"]);
-    $tanggal = htmlspecialchars($_POST["tanggal"]);
-    $jam = htmlspecialchars($_POST["jam"]);
-    $surat_permohonan = htmlspecialchars($_POST["surat_permohonan"]);
-
-    $query = "UPDATE daftartamu SET
-            nama_instansi = '$nama_instansi',
-            nama_tamu = '$nama_tamu',
-            jumlah = '$jumlah',
-            no_telepon = '$no_telepon',
-            perihal_kunjungan = '$perihal_kunjungan',
-            tanggal= '$tanggal',
-            jam= '$jam',
-            surat_permohonan = '$surat_permohonan'
-            WHERE id = $id
-            ";
-    $edit = mysqli_query($conn, $query);
-
-    if ($edit) {
-        echo "<script type='text/javascript'>
-            alert('Data berhasil diedit...!');
-            document.location.href = 'daftartamu.php';
-            </script>";
-    } else {
-        echo "<script type='text/javascript'>
-            alert('Data GAGAL diedit...!');
-            document.location.href = 'daftartamu-edit.php?id=$id';
-            </script>";
-    }
-}
+$id_pengguna = $_SESSION["id"];
+$kd_user = $_GET["kode_user"];
 
 ?>
 <!DOCTYPE html>
@@ -100,68 +60,87 @@ if (isset($_POST["submit"])) {
                     <div class="row">
                         <div class="col-md-12">
                             <!-- general form elements -->
-                            <div class="card card-primary">
+                            <!-- <div class="card card-primary">
                                 <div class="card-header">
                                     <h3 class="card-title">Tambah Data</h3>
-                                </div>
-                            </div>
-                                <!-- /.card-header -->
-                                <div class="card">
-                                    <div class="class-body">
-                                        <div class="table-responsive">
-                                            <table id="" class="table table-hover table-bordered">
-                                                <thead class="table-primary">
-                                                    <tr>
-                                                        <th>Nama Instansi</th>
-                                                        <th>Nama Tamu</th>
-                                                        <th>Jumlah Tamu</th>
-                                                        <th>Nomor Handphone</th>
-                                                        <th>Perihal Kunjungan</th>
-                                                        <th>Tanggal</th>
-                                                        <th>Jam</th>
-                                                        <th>Surat Permohonan</th>
-                                                        <th>Status</th>
-                                                        <th>Alasan</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
+                                </div> -->
+                        </div>
+                        <!-- /.card-header -->
+                        <div class="card">
+                            <div class="class-body">
+                                <div class="table-responsive">
+                                    <table id="" class="table table-hover table-bordered">
+                                        <thead class="table-primary">
+                                            <tr>
+                                                <th>Nama Tamu</th>
+                                                <th>Asal Instansi</th>
+                                                <th>Nama Rekan</th>
+                                                <th>Jumlah Tamu</th>
+                                                <!-- <th>Nomor Handphone</th> -->
+                                                <th>Perihal Kunjungan</th>
+                                                <th>Tanggal</th>
+                                                <th>Jam</th>
+                                                <th>Surat Permohonan</th>
+                                                <th>Status</th>
+                                                <th>Alasan Di tolak</th>
+                                                <!-- <th>Oleh</th> -->
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php
+                                            $no = 1;
+                                            $query_admin = "SELECT * FROM tbl_pemohon A 
+                                            LEFT JOIN tbl_pendaftaran B ON A.id_daftar = B.id_daftar
+                                            LEFT JOIN tbl_pegawai C ON B.id_pegawai = C.id_pegawai
+                                            LEFT JOIN tbl_user D ON A.kode_user = D.kode_user 
+                                            WHERE A.kode_user = '$kd_user' AND status_pemohon IN ('Di Verifikasi', 'Tolak')";
+
+                                            $result_admin = mysqli_query($conn, $query_admin);
+
+                                            while ($row_admin = mysqli_fetch_assoc($result_admin)) { ?>
                                                 <tr>
                                                     <td>
-                                                        <?= $row_daftartamu["nama_instansi"]?>
+                                                        <?= $row_admin["nama_pegawai"] ?>
                                                     </td>
                                                     <td>
-                                                        <?= $row_daftartamu["nama_tamu"]?>
+                                                        <?= $row_admin["asal_pemohon"] ?>
                                                     </td>
                                                     <td>
-                                                        <?= $row_daftartamu["jumlah"]?>
+                                                        <?= $row_admin["namarekan_pemohon"] ?>
                                                     </td>
                                                     <td>
-                                                        <?= $row_daftartamu["no_telepon"]?>
+                                                        <?= $row_admin["jumlahtamu_pemohon"] ?>
+                                                    </td>
+                                                    <!-- <td>
+                                                        <?= $row_admin["no_telp"] ?>
+                                                    </td> -->
+                                                    <td>
+                                                        <?= $row_admin["perihal_pemohon"] ?>
                                                     </td>
                                                     <td>
-                                                        <?= $row_daftartamu["perihal_kunjungan"]?>
+                                                        <?= $row_admin["tanggal_daftar"] ?>
                                                     </td>
                                                     <td>
-                                                        <?= $row_daftartamu["tanggal"]?>
+                                                        <?= $row_admin["jam_daftar"] ?>
                                                     </td>
                                                     <td>
-                                                        <?= $row_daftartamu["jam"]?>
+                                                        <a href="../assets/files/<?= $row_admin["surat_pemohon"] ?>" target="_blank"><?= $row_admin["surat_pemohon"] ?></a>
                                                     </td>
                                                     <td>
-                                                        <a href="../assets/files/<?= $row_daftartamu["surat_permohonan"]?>" target="_blank"><?= $row_daftartamu["surat_permohonan"]?></a>
+                                                        <?= $row_admin["status_pemohon"] ?>
                                                     </td>
                                                     <td>
-                                                        <?= $row_daftartamu["status"]?>
+                                                        <?= $row_admin["alasan"] ?>
                                                     </td>
-                                                    <td>
-                                                        <?= $row_daftartamu["alasan"]?>
-                                                    </td>
+                                                    <!-- <td>
+                                                    <?= $row_admin["oleh"] ?>
+                                                </td> -->
                                                 </tr>
-                                            </tbody>
-                                            </table>
-                                            
-                                        </div>
-                                    </div>
+                                            <?php $no++;
+                                            } ?>
+                                        </tbody>
+                                    </table>
+
                                 </div>
                             </div>
                         </div>
@@ -171,13 +150,13 @@ if (isset($_POST["submit"])) {
                 </div>
                 <!-- /.container-fluid -->
             </section>
+
             <!-- /.content -->
         </div>
         <!-- /.content-wrapper -->
-
         <?php include "theme-footer.php"; ?>
-
     </div>
+
     <!-- ./wrapper -->
 
     <!-- JQuery -->
